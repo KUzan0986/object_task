@@ -6,12 +6,36 @@ def mid_rate(person):
             summa += sum(person.grades[i])
             num += len(person.grades[i])
         try:
-            return summa/num
+            return summa / num
         except ZeroDivisionError:
             return 0
 
 
+def get_avarage(list_of_persons):
+    if isinstance(list_of_persons, list):
+        mid = 0
+        num = 0
+        if isinstance(list_of_persons[0], Student) or isinstance(list_of_persons[0], Lecturer):
+            for i in list_of_persons:
+                mid += mid_rate(i)
+                num += 1
+        try:
+            return mid / num
+        except ZeroDivisionError:
+            return 0
+
+
+def get_list_students():
+    return Student.all_students
+
+
+def get_list_lectors():
+    return Lecturer.all_lectors
+
+
 class Student:
+    all_students = []
+
     def __init__(self, name, surname, gender):
         self.name = name
         self.surname = surname
@@ -19,6 +43,7 @@ class Student:
         self.finished_courses = []
         self.courses_in_progress = []
         self.grades = {}
+        Student.all_students.append(self)
 
     def add_courses(self, course_name):
         self.finished_courses.append(course_name)
@@ -46,7 +71,7 @@ class Student:
         res = ""
         for i in self.finished_courses:
             res += i + ", "
-        res = res[0:len(res)-2]
+        res = res[0:len(res) - 2]
         return res
 
     def __str__(self):
@@ -59,7 +84,8 @@ class Student:
     def __le__(self, studento):
         return mid_rate(self) <= mid_rate(studento)
 
-
+    def __eq__(self, studento):
+        return mid_rate(self) == mid_rate(studento)
 
 class Mentor:
     def __init__(self, name, surname):
@@ -69,9 +95,12 @@ class Mentor:
 
 
 class Lecturer(Mentor):
+    all_lectors = []
+
     def __init__(self, name, surname):
         super().__init__(name, surname)
         self.grades = {}
+        Lecturer.all_lectors.append(self)
 
     def __str__(self):
         return f"Имя: {self.name}\nФамилия: {self.surname}\nСредняя оценка за лекции: {mid_rate(self)}"
@@ -81,6 +110,10 @@ class Lecturer(Mentor):
 
     def __le__(self, reviewer):
         return mid_rate(self) <= mid_rate(reviewer)
+
+    def __eq__(self, reviewer):
+        return mid_rate(self) == mid_rate(reviewer)
+
 
 class Reviewer(Mentor):
     def rate_hw(self, student, course, grade):
@@ -94,5 +127,3 @@ class Reviewer(Mentor):
 
     def __str__(self):
         return f"Имя: {self.name}\nФамилия: {self.surname}"
-
-
